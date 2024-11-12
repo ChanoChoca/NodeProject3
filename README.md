@@ -29,6 +29,8 @@ A Node project made with Express, where it is carried out thanks to the React co
 
 ## Artillery
 
+* Note: You must run the app before running the following command.
+
 ``` bash
 artillery run artillery.yml --output testPerformance.json
 ```
