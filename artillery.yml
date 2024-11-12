@@ -1,13 +1,20 @@
 config:
-  target: 'http://localhost:8080' # Cambia el puerto si es diferente
+  target: 'http://localhost:8080'
   phases:
-    - duration: 20
+#    duration es la duración en segundos
+    - duration: 60
+#    arrivalRate son usuarios virtuales
       arrivalRate: 5
   defaults:
     headers:
       Content-Type: application/json
 
 scenarios:
+  - name: Prueba de generación de mascotas mock
+    flow:
+      - get:
+          url: '/api/mocks/mockingpets'
+
   - name: Prueba de generación de usuarios mock
     flow:
       - get:

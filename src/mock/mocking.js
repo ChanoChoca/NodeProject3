@@ -1,10 +1,9 @@
-
 import bcrypt from "bcrypt";
 import { faker } from '@faker-js/faker';
 
-export function generateMockPets(count, userIds) {
-    const species = ['dog', 'cat', 'rabbit', 'parrot']
-    const pets = []
+export function generateMockPets(count, userIds = []) {
+    const species = ['dog', 'cat', 'rabbit', 'parrot'];
+    const pets = [];
 
     for (let i = 0; i < count; i++) {
         pets.push({
@@ -12,11 +11,11 @@ export function generateMockPets(count, userIds) {
             specie: species[Math.floor(Math.random() * species.length)],
             birthDate: faker.date.past(),
             adopted: Math.random() > 0.5,
-            owner: userIds.length ? userIds[Math.floor(Math.random() * userIds.length)] : null,
+            owner: (userIds && userIds.length > 0) ? userIds[Math.floor(Math.random() * userIds.length)] : null,
             image: faker.image.urlPicsumPhotos()
-        })
+        });
     }
-    return pets
+    return pets;
 }
 
 // Mocking para generar usuarios
