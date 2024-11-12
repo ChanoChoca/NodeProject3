@@ -1,0 +1,22 @@
+config:
+  target: 'http://localhost:8080' # Cambia el puerto si es diferente
+  phases:
+    - duration: 20
+      arrivalRate: 5
+  defaults:
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: Prueba de generación de usuarios mock
+    flow:
+      - get:
+          url: '/api/mocks/mockingusers'
+
+  - name: Prueba de generación masiva de usuarios y mascotas
+    flow:
+      - post:
+          url: '/api/mocks/generateData'
+          json:
+            users: 10
+            pets: 10
