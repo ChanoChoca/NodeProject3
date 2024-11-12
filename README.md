@@ -1,4 +1,6 @@
-Adoptme Project
+# Adoptme Project
+
+A Node project made with Express, where it is carried out thanks to the React course from Coderhouse
 
 ## Table of contents
 
