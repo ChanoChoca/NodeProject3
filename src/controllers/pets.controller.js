@@ -6,6 +6,7 @@ import logger from "../utils/logger.js"; // Asegúrate de importar tu logger
 
 const getAllPets = async (req, res) => {
     try {
+        logger.info('Accediendo a la lista de mascotas');
         const pets = await petsService.getAll();
         res.send({ status: "success", payload: pets });
     } catch (error) {
@@ -16,6 +17,7 @@ const getAllPets = async (req, res) => {
 
 const createPet = async (req, res, next) => {
     try {
+        logger.info('Creando nueva mascota');
         const { name, specie, birthDate } = req.body;
         if (!name || !specie || !birthDate) {
             logger.error("Datos incompletos para crear la mascota");
@@ -34,6 +36,7 @@ const updatePet = async (req, res) => {
     try {
         const petUpdateBody = req.body;
         const petId = req.params.pid;
+        logger.info(`Actualizando mascota con ID: ${req.params.pid}`);
         const result = await petsService.update(petId, petUpdateBody);
         res.send({ status: "success", message: "Pet updated" });
     } catch (error) {
@@ -45,6 +48,7 @@ const updatePet = async (req, res) => {
 const deletePet = async (req, res) => {
     try {
         const petId = req.params.pid;
+        logger.warn(`Eliminando mascota con ID: ${req.params.pid}`);
         const result = await petsService.delete(petId);
         res.send({ status: "success", message: "Pet deleted" });
     } catch (error) {
@@ -55,6 +59,7 @@ const deletePet = async (req, res) => {
 
 const createPetWithImage = async (req, res) => {
     try {
+        logger.info('Creando nueva mascota con imagen');
         const file = req.file;
         const { name, specie, birthDate } = req.body;
 

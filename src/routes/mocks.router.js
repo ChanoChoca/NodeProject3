@@ -1,59 +1,52 @@
 import { Router } from "express";
 import { generateMockPets } from "../mock/mocking.js";
 import { generateMockUsers } from "../mock/mocking.js";
-import userModel from "../dao/models/User.js";
-import petModel from "../dao/models/Pet.js";
-import adoptionModel from "../dao/models/Adoption.js";
-import logger from "../utils/logger.js";
+import {adoptionsService, petsService, usersService} from "../services/index.js";
 
 const router = Router();
 
 // Endpoint de mocking para generar mascotas
 router.get('/mockingpets', (req, res) => {
-    logger.debug('Generando mascotas mockeadas');
-    const mockPets = generateMockPets(100);
-    res.send({ status: "success", payload: mockPets });
+    const numPets = parseInt(req.query.num) || 100;
+    const mockPets = generateMockPets(numPets);
+    res.send({ status: 'success', payload: mockPets });
 });
 
 // Endpoint para /mockingusers
 router.get('/mockingusers', async (req, res) => {
-    logger.debug('Generando usuarios mockeados');
-    const users = generateMockUsers(50);
-    res.json(users);
+    const numUsers = parseInt(req.query.num) || 50;
+    const mockUsers = await generateMockUsers(numUsers);
+    res.send({ status: 'success', payload: mockUsers });
 });
 
 // Endpoint para /generateData
 router.post('/generateData', async (req, res) => {
-    const { users = 0, pets = 0 } = req.body;
-
     try {
-        logger.debug(`Generando datos: usuarios=${users}, mascotas=${pets}`);
+        const { users = 0, pets = 0 } = req.body;
 
-        // 1. Generar usuarios y guardarlos en la base de datos
-        const mockUsers = generateMockUsers(users)
-        const insertedUsers = await userModel.insertMany(mockUsers);
+        const mockUsers = await generateMockUsers(users);
+        const mockPets = generateMockPets(pets);
 
-        // 2. Extraer los IDs de los usuarios insertados para asignarlos como dueños de mascotas
-        const userIds = insertedUsers.map(user => user._id);
+        const createdUsers = await Promise.all(mockUsers.map(user => usersService.create(user)));
+        const createdPets = await Promise.all(mockPets.map(pet => petsService.create(pet)));
 
-        // 3. Generar mascotas y guardarlas en la base de datos
-        const mockPets = generateMockPets(pets, userIds);
-        const insertedPets = await petModel.insertMany(mockPets);
+        const adoptions = [];
+        for (let i = 0; i < Math.min(createdUsers.length, createdPets.length); i++) {
+            adoptions.push({
+                owner: createdUsers[i % createdUsers.length]._id,
+                pet: createdPets[i]._id
+            });
+        }
 
-        // 4. Crear adopciones para mascotas que tienen dueño
-        const adoptions = insertedPets
-            .filter(pet => pet.owner)
-            .map(pet => ({
-                owner: pet.owner,
-                pet: pet._id
-            }));
+        await Promise.all(adoptions.map(adoption => adoptionsService.create(adoption)));
 
-        await adoptionModel.insertMany(adoptions);
-
-        res.status(201).json({ message: 'Usuarios y mascotas generados exitosamente' });
+        res.send({
+            status: 'success',
+            message: "10 users and 20 pets inserted into the database"
+        });
     } catch (error) {
-        logger.error('Error al generar datos: ' + error.message);
-        res.status(500).json({ error: 'Error al generar datos' });
+        console.error("Error generating data:", error);
+        res.status(500).send({ status: 'error', message: 'Internal server error' });
     }
 });
 

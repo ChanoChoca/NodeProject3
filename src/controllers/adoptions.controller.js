@@ -3,6 +3,7 @@ import logger from "../utils/logger.js"; // Asegúrate de importar tu logger
 
 const getAllAdoptions = async (req, res) => {
     try {
+        logger.info('Accediendo a la lista de adopciones');
         const result = await adoptionsService.getAll();
         res.send({ status: "success", payload: result });
     } catch (error) {
@@ -14,6 +15,7 @@ const getAllAdoptions = async (req, res) => {
 const getAdoption = async (req, res) => {
     try {
         const adoptionId = req.params.aid;
+        logger.info(`Consultando adopción con ID: ${adoptionId}`);
         const adoption = await adoptionsService.getBy({ _id: adoptionId });
         if (!adoption) {
             logger.error(`Adopción con ID ${adoptionId} no encontrada`);
@@ -29,6 +31,7 @@ const getAdoption = async (req, res) => {
 const createAdoption = async (req, res) => {
     try {
         const { uid, pid } = req.params;
+        logger.info(`Creando adopción para usuario ${uid} con mascota ${pid}`, { params: req.params });
 
         // Verificar si el usuario existe
         const user = await usersService.getUserById(uid);

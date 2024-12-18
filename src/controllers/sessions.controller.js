@@ -6,6 +6,7 @@ import logger from '../utils/logger.js'; // Asegúrate de importar tu logger
 
 const register = async (req, res) => {
     try {
+        logger.info('Intentando registrar un nuevo usuario');
         const { first_name, last_name, email, password } = req.body;
         if (!first_name || !last_name || !email || !password) {
             logger.error("Datos incompletos para el registro");
@@ -33,6 +34,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
+        logger.info('Intentando iniciar sesión');
         const { email, password } = req.body;
         if (!email || !password) {
             logger.error("Datos incompletos para iniciar sesión");
@@ -59,6 +61,7 @@ const login = async (req, res) => {
 
 const current = async (req, res) => {
     try {
+        logger.info('Obteniendo la sesión actual');
         const cookie = req.cookies['coderCookie'];
         const user = jwt.verify(cookie, 'tokenSecretJWT');
         if (user) {
@@ -72,6 +75,7 @@ const current = async (req, res) => {
 
 const unprotectedLogin = async (req, res) => {
     try {
+        logger.debug('Accediendo al login no protegido');
         const { email, password } = req.body;
         if (!email || !password) {
             logger.error("Datos incompletos para unprotected login");
@@ -97,6 +101,7 @@ const unprotectedLogin = async (req, res) => {
 
 const unprotectedCurrent = async (req, res) => {
     try {
+        logger.debug('Obteniendo la sesión no protegida actual');
         const cookie = req.cookies['unprotectedCookie'];
         const user = jwt.verify(cookie, 'tokenSecretJWT');
         if (user) {
